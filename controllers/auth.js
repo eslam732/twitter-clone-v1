@@ -6,13 +6,28 @@ const { validationResult } = require('express-validator/check');
 
 
 exports.signUp=async(req,res,next)=>{
-   const errors = validationResult(req);
-   if(!errors.isEmpty){
-    const error = new Error('validation failed');
-    error.statusCode=422;
-    error.data=errors.array();
-    throw error;
-}
+//    const errors = validationResult(req);
+//    if(!errors.isEmpty){
+//     const error = new Error('validation failed');
+//     error.statusCode=422;
+//     error.data=errors.array();
+//     throw error;
+// }
+
+
+
+       const us= await User.findOne({email:req.body.email})
+
+       console.debug("user ",us)
+    if(us){
+       return res.status(422).json({
+           message:"faild"
+       })
+    }
+  
+
+
+
     console.log('here',req.body.password);
     const email=req.body.email;
     const password=req.body.password;
