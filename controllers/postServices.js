@@ -1,63 +1,103 @@
-const Post=require('../models/post');
-const User=require('../models/user');
-const CommetModel=require('../models/comments');
+const Post = require('../models/post');
+const User = require('../models/user');
+const CommetModel = require('../models/comments');
+const cloudinary = require('../helper/cloudinaryUpload');
 
-exports.createComment=async(req,res,next)=>{
 
-    const content=req.body.content;
-    const postId=req.body.postId;
-    
+exports.createComment = async (req, res, next) => {
 
-    try{
-       
-        if(content===undefined||postId===undefined){
-            return res.status(422).json({message:"Make sure that the content is not empty and you provide a pot ID"});
+    const content = req.body.content;
+    const replyingTo = req.body.replyingTo;
+    const postId = req.body.postId;
+    const commentId = req.body.commentId;
+    var imageC = '';
+
+    try {
+
+        if (content === undefined || replyingTo === undefined) {
+
+            return res.status(422).json({ message: "Make sure that the content is not empty and replying to someOne" });
         }
-        let post =await Post.findById(postId);
-        if(!post){
-            return res.status(402).json({message:"Post not found"});
+        if (postId === undefined && commentId === undefined) {
+            return res.status(422).json({ message: "need an id for the tweet or the comment" });
+
+        }
+        let post = await Post.findById(postId);
+        let replyingOnComment = await CommetModel.findById(commentId);
+        if (!post && !replyingOnComment) {
+            return res.status(402).json({ message: "Post or reply was not found" });
+        }
+        if (req.file) {
+            //imageUrl = req.file.path;
+            //result= await cloudinary.uploader.upload(req.file.path);
+            //console.log("ressssssssss",result);
+            result = await cloudinary.uploadImageToCloudinary(req.file.path);
+            //console.log('rrrrrrrr',result);
+            imageC = result.url;
+
+        }
+        let comment;
+        if (post) {
+            comment = new CommetModel({
+                content: content,
+                postOfComment: postId,
+                creator: req.userId,
+                imageUrl: imageC,
+                replyingTo: replyingTo
+            });
         }
 
-        const comment=new CommetModel({
-            content:content,
-            postOfComment:postId,
-            creator:req.userId
-        });
+        if (replyingOnComment) {
+            comment = new CommetModel({
+                content: content,
+                replyOnComment: commentId,
+                creator: req.userId,
+                imageUrl: imageC,
+                replyingTo: replyingTo
+            });
+        }
+        res.status(201).json({ message: "comment created", comment: comment });
         await comment.save();
 
 
-        var user=await User.findById(req.userId);
-await user.comments.push(comment);
-await user.save();
-await post.comments.push(comment);
-await post.save();
-res.status(201).json({message:"comment created"});
-        
-    }catch(error){
-        return res.status(500).json({message:"server error"});
+        var user = await User.findById(req.userId);
+        await user.comments.push(comment);
+        await user.save();
+        if (post) {
+            await post.comments.push(comment);
+            await post.save();
+        }
+        if (replyingOnComment){
+            await replyingOnComment.replyies.push(comment);
+            await replyingOnComment.save();
+        }
+
+
+    } catch (error) {
+        return res.status(500).json({ message: "server error" });
     }
 }
 
-exports.getPostComments=async(req,res,next)=>{
-    const postId=req.body.postId;
-    if(!postId){
-        return res.status(422).json({message:'post id is not provided'})
+exports.getPostComments = async (req, res, next) => {
+    const postId = req.body.postId;
+    if (!postId) {
+        return res.status(422).json({ message: 'post id is not provided' })
     }
 
-    try{
-      
-    
-        post=await Post.findById(postId);
-        if(!post){
-            return res.status(422).json({message:'post was not found'})
+    try {
+
+
+        post = await Post.findById(postId);
+        if (!post) {
+            return res.status(422).json({ message: 'post was not found' })
         }
-        comments=await CommetModel.find().where({postOfComment:postId})
+        comments = await CommetModel.find().where({ postOfComment: postId })
         res.status(200).json({
-            message:"post found",
-            comments:comments
+            message: "post found",
+            comments: comments
         })
-    }catch(error){
-        return res.status(500).json({message:'server error'})
+    } catch (error) {
+        return res.status(500).json({ message: 'server error' })
     }
-    
+
 }

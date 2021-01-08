@@ -3,14 +3,14 @@ const fs = require('fs');
 const path = require('path');
 const Post=require('../models/post');
 const User=require('../models/user');
+const cloudinary=require('../helper/cloudinaryUpload');
+// var cloudinary=require('cloudinary').v2;
+// cloudinary.config({
+// cloud_name:'eaa04168',
+// api_key:'272569683349881',
+// api_secret:'Cdqg4M48LO5NrKHU3c-wcXZ669A'
 
-var cloudinary=require('cloudinary').v2;
-cloudinary.config({
-cloud_name:'eaa04168',
-api_key:'272569683349881',
-api_secret:'Cdqg4M48LO5NrKHU3c-wcXZ669A'
-
-});
+// });
 
 
 exports.createPost=async(req,res,next)=>{
@@ -28,8 +28,10 @@ if(content===undefined){
 
 if(req.file) {
     //imageUrl = req.file.path;
-result= await cloudinary.uploader.upload(req.file.path);
+//result= await cloudinary.uploader.upload(req.file.path);
 //console.log("ressssssssss",result);
+result=await cloudinary.uploadImageToCloudinary(req.file.path);
+//console.log('rrrrrrrr',result);
 imageC=result.url;
 
 }
@@ -86,7 +88,7 @@ const postId=req.body.postId;
 console.log('post id ',postId)
 try{
     var postResult=await Post.findById(postId);
-    console.log('pppppppppppp',postResult)
+    
     if(!postResult){
         return res.status(404).json({
             message:"Post was not Found"
@@ -94,13 +96,12 @@ try{
     }
 
     if(postResult.creator.toString()!==req.userId.toString()){
-        console.log('reqidddddddddddddddddddddddd',req.userId)
-        console.log('postddddddddddddddddddddddd',postResult.creator)
+        
         return res.status(405).json({
             message:"Not allowed"
         });
     }
-   console.log('heeeeeeeeeeeeeeee')
+  
     deletedPost=await Post.findByIdAndRemove(postId);
     currentUser=await User.findById(req.userId);
     currentUser.posts.pull( postId);
