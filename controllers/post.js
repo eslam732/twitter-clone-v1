@@ -1,12 +1,10 @@
-const { isRef } = require("joi");
+
 const fs = require('fs');
 const path = require('path');
 const Post=require('../models/post');
-const { post } = require("../routes/auth");
 const User=require('../models/user');
-const user = require("../models/user");
+
 var cloudinary=require('cloudinary').v2;
-const { compareSync } = require("bcryptjs");
 cloudinary.config({
 cloud_name:'eaa04168',
 api_key:'272569683349881',
@@ -62,6 +60,25 @@ return res.status(500).json({message:error});
 }
 
 
+}
+exports.getPosts=async(req,res,next)=>{
+const currentPage=req.query.page||1;
+const perPage=2;
+let totalItmes;
+var posts;
+try
+{
+ totalItmes=await Post.find().countDocuments();
+ 
+posts=await Post.find().populate('creator',{name:1}).sort({createdAt:-1}).skip((currentPage-1)*perPage).limit(perPage);
+
+res.status(200).json({message:"posts",posts:posts,totalItmes:totalItmes});
+
+}catch(error){
+
+
+
+}
 }
 
 exports.deletePost=async(req,res,next)=>{

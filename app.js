@@ -6,6 +6,7 @@ const mongoose=require('mongoose');
 
 const authRouts=require('./routes/auth');
 const postRouts=require('./routes/posts');
+const postServicesRouts=require('./routes/postServices');
 const { post } = require('./routes/auth');
 
 const app=express();
@@ -25,9 +26,10 @@ app.use((req, res, next) => {
   });
 
 
-console.log('here');
+
   app.use('/auth',authRouts);
   app.use('/post',postRouts);
+  app.use('/postServices',postServicesRouts);
   
   app.use((error, req, res, next) => {
     console.log(error);
