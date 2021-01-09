@@ -49,6 +49,6 @@ const dbOptions = {
 
 mongoose.connect(process.env.MONGO_URL, dbOptions)
 .then(result=>{
-    app.listen(9090);
-    console.log('connected');
+    app.listen(process.env.PORT, ()=> console.log(`Server is running on PORT: ${process.env.PORT}`));
+    console.log('connected To mongodb ...');
 });
