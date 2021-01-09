@@ -40,7 +40,7 @@ app.use((req, res, next) => {
     res.status(status).json({ message: message,data :data});
   });
 
-mongoose.connect('mongodb+srv://eslam:eslam123@cluster0.7q1oh.mongodb.net/train?retryWrites=true&w=majority')
+mongoose.connect(process.env.MONGO_URL)
 .then(result=>{
     app.listen(9090);
     console.log('connected');
