@@ -1,8 +1,12 @@
-const { ObjectId } = require('bson');
+// const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+    fullname: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true
@@ -11,9 +15,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    name: {
+    username: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     profilePictue: {
         type: String
@@ -24,38 +29,18 @@ const userSchema = new Schema({
     city: {
         type: String
     },
-    following: [
+    followings: [
         {
             type: Schema.Types.ObjectId,
-            ref: "USer"
+            ref: "User"
         }
     ],
     followers: [
         {
             type: Schema.Types.ObjectId,
-            ref: "USer"
+            ref: "User"
         }
     ],
-
-    posts: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Post'
-    }],
-
-    retweets: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Post'
-    }],
-    comments: [{
-        type: Schema.Types.ObjectId,
-        ref: "Comment"
-    }],
-    likedPost:[
-        {
-            type:Schema.Types.ObjectId,
-            ref:"Post"
-        }
-    ]
 
 },
     { timestamps: true }
