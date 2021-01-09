@@ -1,7 +1,5 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-//const { body, validationResult, check } = require('express-validator/check');
-const emailValidator = require("email-validator");
 const jwt=require('jsonwebtoken');
 
 
@@ -58,35 +56,43 @@ const login = async(req,res,next)=>{
     const email = req.body.email;
     const password = req.body.password;
 
-    // First Check if user exists
-    const user = await User.findOne({email: email});
+    try {
+        // First Check if user exists
+        const user = await User.findOne({email: email});
+        
+        if(!user){
+            return res.status(400).json({
+                error: 'This email Doesn\'t Exist'
+            });
+        }
+        // Here User exist
+        // Let's Check password
+        const isCorrect = await bcrypt.compare(password, user.password);
     
-    if(!user){
-        return res.status(400).json({
-            error: 'This email Doesn\'t Exist'
-        });
-    }
-
-    // Here User exist
-    // Let's Check password
-    const isCorrect = await bcrypt.compare(password, user.password);
-    if (!iscorrect) {
-        return res.status(400).json({
-            error: 'Password isn\'t correct'
-        });
-    }
+        if (!isCorrect) {
+            return res.status(400).json({
+                error: 'Password isn\'t correct'
+            });
+        }
+        
+        // Here Everything is Okay :)
+        // Let's create a Token 
+        const token = jwt.sign({
+            email: user.email,
+            username: user.username,
+            _id: user._id
+        },process.env.TOKEN_SECRET);
     
-    // Here Everything is Okay :)
-    // Let's create a Token 
-    const token = jwt.sign({
-        email: user.email,
-        username: user.username,
-        _id: user._id
-    },process.env.TOKEN_SECRET);
-
-    //Send token to the Client in the response header
-    res.header('auth-token', token);
-    return res.status(200).json({msg: 'Logged in'});
+        //Send token to the Client in the response header
+        res.header('auth-token', token);
+        return res.status(200).json({msg: 'Logged in'});
+        
+    } catch (error) {
+        if (!error.statusCode) {
+            error.statusCode = 500;
+        }
+        next(error);
+    }   
 }
 
 module.exports = {
