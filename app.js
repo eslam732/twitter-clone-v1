@@ -40,7 +40,14 @@ app.use((req, res, next) => {
     res.status(status).json({ message: message,data :data});
   });
 
-mongoose.connect(process.env.MONGO_URL)
+
+const dbOptions = {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useCreateIndex: true
+};
+
+mongoose.connect(process.env.MONGO_URL, dbOptions)
 .then(result=>{
     app.listen(9090);
     console.log('connected');
