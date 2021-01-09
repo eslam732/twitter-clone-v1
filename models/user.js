@@ -1,4 +1,4 @@
-const { ObjectId } = require('bson');
+// const { ObjectId } = require('bson');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -32,13 +32,13 @@ const userSchema = new Schema({
     followings: [
         {
             type: Schema.Types.ObjectId,
-            ref: "USer"
+            ref: "User"
         }
     ],
     followers: [
         {
             type: Schema.Types.ObjectId,
-            ref: "USer"
+            ref: "User"
         }
     ],
 
