@@ -8,7 +8,6 @@ const mongoose=require('mongoose');
 const authRouts=require('./routes/auth');
 const postRouts=require('./routes/posts');
 const postServicesRouts=require('./routes/postServices');
-const { post } = require('./routes/auth');
 
 const app=express();
 app.use(bodyParser.urlencoded());
