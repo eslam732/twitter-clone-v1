@@ -1,6 +1,6 @@
-const Post = require('../models/post');
+const Post = require('../models/tweet');
 const User = require('../models/user');
-const CommetModel = require('../models/comments');
+const CommetModel = require('../models/reply');
 const cloudinary = require('../helper/cloudinaryUpload');
 
 
@@ -8,8 +8,9 @@ const createComment = async (req, res, next) => {
 
     const content = req.body.content;
     const replyingTo = req.body.replyingTo;
-    const postId = req.body.postId;
-    const commentId = req.body.commentId;
+    const tweetId = req.body.tweetId;
+    console.log('ttttttttttttttt',tweetId)
+    const replyId = req.body.replyId;
     var imageC = '';
 
     try {
@@ -18,13 +19,13 @@ const createComment = async (req, res, next) => {
 
             return res.status(422).json({ message: "Make sure that the content is not empty and replying to someOne" });
         }
-        if (postId === undefined && commentId === undefined) {
+        if (tweetId === undefined && replyId === undefined) {
             return res.status(422).json({ message: "need an id for the tweet or the comment" });
 
         }
-        let post = await Post.findById(postId);
-        let replyingOnComment = await CommetModel.findById(commentId);
-        if (!post && !replyingOnComment) {
+        let tweet = await Post.findById(tweetId);
+        let replyOnReply = await CommetModel.findById(replyId);
+        if (!tweet && !replyOnReply) {
             return res.status(402).json({ message: "Post or reply was not found" });
         }
         if (req.file) {
@@ -36,41 +37,39 @@ const createComment = async (req, res, next) => {
             imageC = result.url;
 
         }
-        let comment;
-        if (post) {
-            comment = new CommetModel({
+        let reply;
+        if (tweet) {
+            reply = new CommetModel({
                 content: content,
-                postOfComment: postId,
+                tweetOfReply: tweetID,
                 creator: req.userId,
                 imageUrl: imageC,
                 replyingTo: replyingTo
             });
         }
 
-        if (replyingOnComment) {
-            comment = new CommetModel({
+        if (replyOnReply) {
+            reply = new CommetModel({
                 content: content,
-                replyOnComment: commentId,
+                replyOnReply: replyId,
                 creator: req.userId,
                 imageUrl: imageC,
                 replyingTo: replyingTo
             });
 
         }
-        res.status(201).json({ message: "comment created", comment: comment });
-        await comment.save();
+        res.status(201).json({ message: "comment created", comment: reply });
+        await reply.save();
 
 
-        var user = await User.findById(req.userId);
-        await user.comments.push(comment);
-        await user.save();
-        if (post) {
-            await post.comments.push(comment);
-            await post.save();
+        
+        if (tweet) {
+            await tweet.replies.push(reply);
+            await tweet.save();
         }
-        if (replyingOnComment){
-            await replyingOnComment.replyies.push(comment);
-            await replyingOnComment.save();
+        if (replyOnReply){
+            await replyOnReply.replies.push(reply);
+            await replyOnReply.save();
         }
 
 
@@ -130,7 +129,7 @@ const likePost=(req,res,next)=>{
     const commentId=req.body.commentId;
     const quoteId=req.body.quoteId;
 
-    
+
 
 
 

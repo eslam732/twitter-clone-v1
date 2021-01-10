@@ -1,7 +1,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Post=require('../models/post');
+const Post=require('../models/tweet');
 const User=require('../models/user');
 const cloudinary=require('../helper/cloudinaryUpload');
 // var cloudinary=require('cloudinary').v2;
@@ -13,7 +13,7 @@ const cloudinary=require('../helper/cloudinaryUpload');
 // });
 
 
-exports.createPost=async(req,res,next)=>{
+exports.createTweet=async(req,res,next)=>{
 
 const content=req.body.content;
 //var imageUrl='';
@@ -47,10 +47,9 @@ try{
      await post.save();
     // console.debug('pppppppp',req.file.path)
     if(req.file)fs.unlinkSync(req.file.path);
-var user=await User.findById(req.userId);
-await user.posts.push(post);
+
  
-await user.save();
+
 return res.status(201).json({
     message:"Post created",
     post:post,
@@ -63,18 +62,18 @@ return res.status(500).json({message:error});
 
 
 }
-exports.getPosts=async(req,res,next)=>{
+exports.getTweets=async(req,res,next)=>{
 const currentPage=req.query.page||1;
 const perPage=2;
 let totalItmes;
-var posts;
+var tweets;
 try
 {
  totalItmes=await Post.find().countDocuments();
  
-posts=await Post.find().populate('creator',{name:1}).sort({createdAt:-1}).skip((currentPage-1)*perPage).limit(perPage);
+tweets=await Post.find().populate('creator',{name:1}).sort({createdAt:-1}).skip((currentPage-1)*perPage).limit(perPage);
 
-res.status(200).json({message:"posts",posts:posts,totalItmes:totalItmes});
+res.status(200).json({message:"tweets",tweets:tweets,totalItmes:totalItmes});
 
 }catch(error){
 
@@ -83,29 +82,27 @@ res.status(200).json({message:"posts",posts:posts,totalItmes:totalItmes});
 }
 }
 
-exports.deletePost=async(req,res,next)=>{
-const postId=req.body.postId;
-console.log('post id ',postId)
+exports.deleteTweet=async(req,res,next)=>{
+const tweetId=req.body.tweetId;
+console.log('post id ',tweetId)
 try{
-    var postResult=await Post.findById(postId);
+    var tweetResult=await Post.findById(tweetId);
     
-    if(!postResult){
+    if(!tweetResult){
         return res.status(404).json({
             message:"Post was not Found"
         });
     }
 
-    if(postResult.creator.toString()!==req.userId.toString()){
+    if(tweetResult.creator.toString()!==req.userId.toString()){
         
         return res.status(405).json({
             message:"Not allowed"
         });
     }
   
-    deletedPost=await Post.findByIdAndRemove(postId);
-    currentUser=await User.findById(req.userId);
-    currentUser.posts.pull( postId);
-    await currentUser.save();
+   await Post.findByIdAndRemove(tweetId);
+    
     return res.status(202).json({
         message:"Deleted"
     })

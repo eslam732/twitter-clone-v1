@@ -12,7 +12,7 @@ if(!authHeader){
 const token=authHeader.split(' ')[1];
 let decodedToken;
 try{
-  decodedToken=jwt.decode(token,'mySecret');
+  decodedToken=jwt.decode(token, process.env.TOKEN_SECRET);
 }catch(error){
     return res.status(500).json({
         message:"Something Went Wrong"
@@ -26,6 +26,7 @@ if(!decodedToken){
     
 }
 req.userId=decodedToken.usrId;
-console.log("authhhh",req.userId);
+
 next();
 }
+
