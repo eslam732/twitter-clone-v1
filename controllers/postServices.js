@@ -4,7 +4,7 @@ const CommetModel = require('../models/comments');
 const cloudinary = require('../helper/cloudinaryUpload');
 
 
-exports.createComment = async (req, res, next) => {
+const createComment = async (req, res, next) => {
 
     const content = req.body.content;
     const replyingTo = req.body.replyingTo;
@@ -55,6 +55,7 @@ exports.createComment = async (req, res, next) => {
                 imageUrl: imageC,
                 replyingTo: replyingTo
             });
+
         }
         res.status(201).json({ message: "comment created", comment: comment });
         await comment.save();
@@ -78,7 +79,7 @@ exports.createComment = async (req, res, next) => {
     }
 }
 
-exports.getPostComments = async (req, res, next) => {
+const getPostComments = async (req, res, next) => {
     const postId = req.body.postId;
     if (!postId) {
         return res.status(422).json({ message: 'post id is not provided' })
@@ -100,4 +101,44 @@ exports.getPostComments = async (req, res, next) => {
         return res.status(500).json({ message: 'server error' })
     }
 
+}
+
+const getReplyies=async(req,res,next)=>{
+    const tweetId = req.body.tweetId;
+    if (!tweetId) {
+        return res.status(422).json({ message: 'tweet id is not provided' })
+    }
+
+    try {
+
+
+        comment = await CommetModel.findById(tweetId);
+        if (!comment) {
+            return res.status(422).json({ message: 'comment was not found' })
+        }
+        comments = await CommetModel.find().populate('replyies',{content:1}).sort({createdAt:-1}).where({ replyOnComment: tweetId })
+        res.status(200).json({
+            message: "post found",
+            comments: comments
+        })
+    } catch (error) {
+        return res.status(500).json({ message: 'server error' })
+    }
+}
+const likePost=(req,res,next)=>{
+    const tweetId=req.body.tweetId;
+    const commentId=req.body.commentId;
+    const quoteId=req.body.quoteId;
+
+    
+
+
+
+}
+
+
+module.exports = {
+    createComment,
+    getPostComments,
+    getReplyies
 }

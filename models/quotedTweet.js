@@ -2,34 +2,26 @@ const { string } = require('joi');
 const mongoose=require('mongoose');
 const Schema=mongoose.Schema;
 
-const postSchema=new Schema({
-
-
-    imageUrl:{
-        type:String
-    },
-    content:{
+const quotedTweet=new Schema({
+    quote:{
         type:String,
         required:true
     },
     creator:{
         type:Schema.Types.ObjectId,
-        required:true,
         ref:"User"
     },
-    comments:[{
-        type:Schema.Types.ObjectId,
-        ref:"Comment"
-
-    }],
     likes:{
         numberOfLikes:{default:0,type:Number},
         usersLikes:[{
             type:Schema.Types.ObjectId,
             ref:"User"
         }]
+    },
+    originalPost:{
+        type:Schema.Types.ObjectId,
+        ref:"Post"
     }
-},
-{ timestamps: true })
+},{timestamps:true});
 
-module.exports = mongoose.model('Post',postSchema);
+module.exports = mongoose.model('Quote',quotedTweet);

@@ -27,7 +27,14 @@ const commentSchema = new Schema({
     replyingTo: [{
         type: String,
         required: true
-    }]
+    }],
+    likes:{
+        numberOfLikes:{default:0,type:Number},
+        usersLikes:[{
+            type:Schema.Types.ObjectId,
+            ref:"User"
+        }]
+    }
 
 
 });

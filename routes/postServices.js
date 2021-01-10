@@ -8,5 +8,5 @@ const uploadImage=require('../helper/uploadImage');
 
 router.put('/createcomment',isAuth,uploadImage.single('image'),postServices.createComment);
 router.get('/getpostcomments',isAuth,postServices.getPostComments);
-
+router.get('/getreplyies',isAuth,postServices.getReplyies);
 module.exports = router;
