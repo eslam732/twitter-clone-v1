@@ -5,10 +5,10 @@ const signupValidationRules = () => {
     return [
         check('username').trim().isLength({min:4}).isAlphanumeric(),
         check('password').trim().isLength({min:6}),
-        check('email').notEmpty().isEmail(),
         check('fullname').trim().isString().isLength({min:4}),
         check('bio').optional({nullable: true}),
         check('city').optional({nullable: true}),
+        check('email').notEmpty().isEmail(),
     ]
 }
 

@@ -1,31 +1,21 @@
 const jwt=require('jsonwebtoken');
 
-module.exports=(req,res,next)=>{
-const authHeader=req.get('Authorization');
+module.exports = (req, res, next) =>{
+    const token = req.get('auth-token');
 
-if(!authHeader){
-    return res.status(401).json({
-        message:"Not authorized"
-    });
-}
+    // Check if the header doesnt even exist
+    if(!token){
+        return res.status(401).json({msg: 'Access-denied'});
+    }
 
-const token=authHeader.split(' ')[1];
-let decodedToken;
-try{
-  decodedToken=jwt.decode(token,'mySecret');
-}catch(error){
-    return res.status(500).json({
-        message:"Something Went Wrong"
-    });
-};
+    // Here There is a token
+    // But let's check if it's correct
 
-if(!decodedToken){
-    return res.status(401).json({
-        message:"not authorized"
-    });
-    
-}
-req.userId=decodedToken.usrId;
-console.log("authhhh",req.userId);
-next();
+    try {
+        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+        req.user = verified;
+        next();
+    } catch (error) {
+        res.status(400).json({err:'invalid Token'});
+    }    
 }
