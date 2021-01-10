@@ -42,8 +42,14 @@ const tweetSchema=new Schema({
             type: Schema.Types.ObjectId,
             ref: 'User'
         }
-    ]
+    ],
+
+    imageUrl: {
+        type: String
+    }
 },
 { timestamps: true })
 
+
+module.exports.tweetSchema = tweetSchema;
 module.exports = mongoose.model('Tweet',tweetSchema);
