@@ -1,35 +1,49 @@
-const { string } = require('joi');
-const mongoose=require('mongoose');
-const Schema=mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const postSchema=new Schema({
-
-
-    imageUrl:{
-        type:String
-    },
+const tweetSchema=new Schema({
     content:{
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
-    creator:{
-        type:Schema.Types.ObjectId,
-        required:true,
-        ref:"User"
-    },
-    comments:[{
-        type:Schema.Types.ObjectId,
-        ref:"Comment"
 
-    }],
-    likes:{
-        numberOfLikes:{default:0,type:Number},
-        usersIkes:[{
-            type:Schema.Types.ObjectId,
-            ref:"User"
-        }]
-    }
+    creator:{
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
+
+    likes: {
+        type: Number,
+        default: 0,
+    },
+
+    retweets: {
+        type: Number,
+        default: 0,
+    },
+
+    replies:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Tweet'
+        }
+    ],
+
+    likedBy: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
+
+    retweetedBy: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ]
 },
 { timestamps: true })
 
-module.exports = mongoose.model('Post',postSchema);
+module.exports = mongoose.model('Tweet',tweetSchema);
