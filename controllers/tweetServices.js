@@ -9,9 +9,11 @@ const createComment = async (req, res, next) => {
     const content = req.body.content;
     const replyingTo = req.body.replyingTo;
     const tweetId = req.body.tweetId;
-    console.log('ttttttttttttttt',tweetId)
+
     const replyId = req.body.replyId;
     var imageC = '';
+    let tweet;
+    let repliedReply;
 
     try {
 
@@ -23,9 +25,12 @@ const createComment = async (req, res, next) => {
             return res.status(422).json({ message: "need an id for the tweet or the comment" });
 
         }
-        let tweet = await Post.findById(tweetId);
-        let replyOnReply = await CommetModel.findById(replyId);
-        if (!tweet && !replyOnReply) {
+
+        if (tweetId) tweet = await Post.findById(tweetId);
+
+        if (replyId) repliedReply = await CommetModel.findById(replyId);
+        
+        if (!tweet && !repliedReply) {
             return res.status(402).json({ message: "Post or reply was not found" });
         }
         if (req.file) {
@@ -37,18 +42,20 @@ const createComment = async (req, res, next) => {
             imageC = result.url;
 
         }
-        let reply;
+        var reply;
+
         if (tweet) {
+            // console.log('ttttttttttttttt',tweet)
             reply = new CommetModel({
                 content: content,
-                tweetOfReply: tweetID,
+                tweetOfReply: tweetId,
                 creator: req.userId,
                 imageUrl: imageC,
                 replyingTo: replyingTo
             });
         }
 
-        if (replyOnReply) {
+        if (repliedReply) {
             reply = new CommetModel({
                 content: content,
                 replyOnReply: replyId,
@@ -58,23 +65,25 @@ const createComment = async (req, res, next) => {
             });
 
         }
-        res.status(201).json({ message: "comment created", comment: reply });
+
         await reply.save();
 
 
-        
+        console.log('repliedReply',req.userId)
         if (tweet) {
             await tweet.replies.push(reply);
             await tweet.save();
         }
-        if (replyOnReply){
-            await replyOnReply.replies.push(reply);
-            await replyOnReply.save();
+        if (repliedReply) {
+            await repliedReply.replies.push(reply);
+            await repliedReply.save();
         }
+        res.status(201).json({ message: "comment created", comment: reply });
 
 
-    } catch (error) {
-        return res.status(500).json({ message: "server error" });
+    } catch (error) {  console.log(error);
+        return res.status(500).json({ message: "server error" ,error:error});
+      
     }
 }
 
@@ -91,7 +100,7 @@ const getPostComments = async (req, res, next) => {
         if (!post) {
             return res.status(422).json({ message: 'post was not found' })
         }
-        comments = await CommetModel.find().where({ postOfComment: postId })
+        comments = await CommetModel.find().where({ tweetOfReply: postId })
         res.status(200).json({
             message: "post found",
             comments: comments
@@ -102,7 +111,7 @@ const getPostComments = async (req, res, next) => {
 
 }
 
-const getReplyies=async(req,res,next)=>{
+const getReplyies = async (req, res, next) => {
     const tweetId = req.body.tweetId;
     if (!tweetId) {
         return res.status(422).json({ message: 'tweet id is not provided' })
@@ -111,11 +120,11 @@ const getReplyies=async(req,res,next)=>{
     try {
 
 
-        comment = await CommetModel.findById(tweetId);
+       var comment = await CommetModel.findById(tweetId);
         if (!comment) {
             return res.status(422).json({ message: 'comment was not found' })
         }
-        comments = await CommetModel.find().populate('replyies',{content:1}).sort({createdAt:-1}).where({ replyOnComment: tweetId })
+       var comments = await CommetModel.find().populate('replies', { content: 1 }).sort({ createdAt: -1 }).where({ replyOnReply: tweetId })
         res.status(200).json({
             message: "post found",
             comments: comments
@@ -124,20 +133,93 @@ const getReplyies=async(req,res,next)=>{
         return res.status(500).json({ message: 'server error' })
     }
 }
-const likePost=(req,res,next)=>{
-    const tweetId=req.body.tweetId;
-    const commentId=req.body.commentId;
-    const quoteId=req.body.quoteId;
+const likePost =async (req, res, next) => {
+    const tweetId = req.body.tweetId;
+    const commentId = req.body.commentId;
+    const quoteId = req.body.quoteId;
+ 
+   if(!tweetId&&!commentId&&!quoteId){
+   return res.status(200).json({
+        message: "tweet id is required"
+        
+    });}
+    
+    try{
+        
+let tweet,comment,reply;
+if(tweetId){
+   
+tweet=await Post.findById(tweetId);
+//console.log("twwww",tweet)
+if(!tweet)
+{
+return res.status(404).json({message:"tweet was not found"});
+}
+
+let exist=tweet.likedBy;
+var flag=(exist.indexOf(req.userId.toString()))+1;
+console.log('exxx',flag)
+if(flag){
+    
+    tweet.likes--
+    tweet.likedBy.pull(req.userId) 
+}
+else{
+    tweet.likes++,
+    tweet.likedBy.push(req.userId)
+}
 
 
 
+tweet.save()
+return res.status(201).json({tweet:tweet})
 
 
 }
+if(commentId){
+   
+    comment=await CommetModel.findById(commentId);
+    //console.log("twwww",tweet)
+    if(!comment)
+    {
+    return res.status(404).json({message:"comment was not found"});
+    }
+    
+    let exist=comment.likes.usersLikes;
+    var flag=(exist.indexOf(req.userId.toString()))+1;
+    
+    if(flag){
+        
+        comment.likes.numberOfLikes--
+        comment.likes.usersLikes.pull(req.userId) 
+    }
+   
+    else{
+        comment.likes.numberOfLikes++,
+      comment.likes. usersLikes.push(req.userId)
+    }
+    
+    
+    
+    comment.save()
+    return res.status(201).json({comment:comment})
+    
+    
+    }
+
+    }catch(ereror){
+
+    }
+   }
+
+
+
+
 
 
 module.exports = {
     createComment,
     getPostComments,
-    getReplyies
+    getReplyies,
+    likePost
 }

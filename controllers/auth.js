@@ -80,12 +80,12 @@ const login = async(req,res,next)=>{
         const token = jwt.sign({
             email: user.email,
             username: user.username,
-            _id: user._id
+            userId:user._id.toString()
         },process.env.TOKEN_SECRET);
     
         //Send token to the Client in the response header
-        res.header('auth-token', token);
-        return res.status(200).json({msg: 'Logged in'});
+        //res.header('auth-token', token);
+        return res.status(200).json({msg: 'Logged in',info:token});
         
     } catch (error) {
         if (!error.statusCode) {

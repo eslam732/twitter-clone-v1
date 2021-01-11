@@ -36,6 +36,7 @@ imageC=result.url;
 
 }
 try{
+  
     
    var post= new Post({
    content:content,

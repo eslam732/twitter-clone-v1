@@ -20,7 +20,7 @@ const commentSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    replyies:[{
+    replies:[{
         type:Schema.Types.ObjectId,
         ref:"Reply"
     }],

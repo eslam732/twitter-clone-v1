@@ -28,7 +28,7 @@ app.use((req, res, next) => {
     next();
   });
 
-  app.use('/user',authRouts);
+  app.use('/auth',authRouts);
   app.use('/post',postRouts);
   app.use('/postServices',postServicesRouts);
   

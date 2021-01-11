@@ -25,7 +25,8 @@ if(!decodedToken){
     });
     
 }
-req.userId=decodedToken.usrId;
+req.userId=decodedToken.userId;
+console.log('req',req.userId)
 
 next();
 }
