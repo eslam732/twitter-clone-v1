@@ -1,3 +1,4 @@
+const { bool } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -46,6 +47,29 @@ const tweetSchema=new Schema({
 
     imageUrl: {
         type: String
+    },
+    quoted:{
+        
+status:{type:Boolean,
+default:false},
+
+originalTweet:{
+    type:Schema.Types.ObjectId,
+    ref:"Tweet"
+}
+    },
+    quotedTweets:{
+        numberOfQuotes:{default:0,type:Number},
+        quotedBy:[{
+            type:Schema.Types.ObjectId,
+            ref:"User"
+        }],
+        quotes:[
+            {
+                type:Schema.Types.ObjectId,
+                ref:"Tweet"  
+            }
+        ]
     }
 },
 { timestamps: true })

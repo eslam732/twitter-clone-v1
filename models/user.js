@@ -41,6 +41,22 @@ const userSchema = new Schema({
             ref: "User"
         }
     ],
+    tweets:[{
+        type:Schema.Types.ObjectId,
+        ref:"Tweet"
+    }],
+    replies:[{
+        type:Schema.Types.ObjectId,
+        ref:"Reply"
+    }],
+    
+    
+    likes:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:"Tweet"
+        }
+    ]
 
 },
     { timestamps: true }

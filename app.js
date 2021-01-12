@@ -6,9 +6,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 // Import Routes
-const authRouts = require('./routes/auth');
-const postRouts = require('./routes/posts');
-const postServicesRouts = require('./routes/postServices');
+const authRouts = require('./routes/user/auth');
+const postRouts = require('./routes/tweet/posts');
+const postServicesRouts = require('./routes/tweet/postServices');
+const userServicesRouts = require('./routes/user/userServices');
 
 const app = express();
 
@@ -28,9 +29,12 @@ app.use((req, res, next) => {
     next();
   });
 
-  app.use('/auth',authRouts);
+  app.use('/user/auth',authRouts);
+  app.use('/user/services',authRouts);
   app.use('/post',postRouts);
   app.use('/postServices',postServicesRouts);
+  app.use('/userServices',userServicesRouts);
+
   
   app.use((error, req, res, next) => {
     console.log(error);

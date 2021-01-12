@@ -1,9 +1,9 @@
 const express =require('express');
 const router=express.Router();
-const isAuth=require('../helper/isAuth');
+const isAuth=require('../../helper/isAuth');
 
-const postServices=require('../controllers/tweetServices');
-const uploadImage=require('../helper/uploadImage');
+const postServices=require('../../controllers/tweetServices');
+const uploadImage=require('../../helper/uploadImage');
 
 
 router.put('/createcomment',isAuth,uploadImage.single('image'),postServices.createComment);

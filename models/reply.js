@@ -13,8 +13,10 @@ const commentSchema = new Schema({
         type:String
     },
     replyOnReply: {
-        type: Schema.Types.ObjectId,
-        ref: "Reply"
+          status:{type:Boolean,
+            default:false},
+       replyingOn:{ type: Schema.Types.ObjectId,
+        ref: "Reply"}
     },
     creator: {
         type: Schema.Types.ObjectId,

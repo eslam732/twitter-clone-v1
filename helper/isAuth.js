@@ -13,8 +13,10 @@ const token=authHeader.split(' ')[1];
 let decodedToken;
 try{
   decodedToken=jwt.decode(token, process.env.TOKEN_SECRET);
-}catch(error){
+
+}catch(error){console.log(error)
     return res.status(500).json({
+        
         message:"Something Went Wrong"
     });
 };
@@ -26,7 +28,7 @@ if(!decodedToken){
     
 }
 req.userId=decodedToken.userId;
-console.log('req',req.userId)
+//console.log('req',req.userId)
 
 next();
 }

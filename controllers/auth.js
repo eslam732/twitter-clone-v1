@@ -79,8 +79,8 @@ const login = async(req,res,next)=>{
         // Let's create a Token 
         const token = jwt.sign({
             email: user.email,
-            username: user.username,
-            userId:user._id.toString()
+           // username: user.username,
+            userId:user._id
         },process.env.TOKEN_SECRET);
     
         //Send token to the Client in the response header
