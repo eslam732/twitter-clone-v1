@@ -14,7 +14,7 @@ const { error } = require('console');
 // });
 
 
-exports.createTweet = async (req, res, next) => {
+const createTweet = async (req, res, next) => {
 
     const content = req.body.content;
     //var imageUrl='';
@@ -52,11 +52,14 @@ exports.createTweet = async (req, res, next) => {
 
 
 
-        return res.status(201).json({
+         res.status(201).json({
             message: "Post created",
             post: post,
 
-        })
+        });
+        let user=await User.findById(req.userId);
+        user.tweets.push(post._id);
+        user.save()
 
     } catch (error) {
         return res.status(500).json({ message: error });
@@ -66,7 +69,7 @@ exports.createTweet = async (req, res, next) => {
 }
 
 
-exports.quoteTweet = async (req, res, next) => {
+const quoteTweet = async (req, res, next) => {
 
     const content = req.body.content;
     const originalTweetId = req.body.originalTweetId;
@@ -77,7 +80,10 @@ exports.quoteTweet = async (req, res, next) => {
         return res.status(400).json({ message: "content is required and the id for the original tweet" });
     };
 
-    const originalTweet = await Post.findById(originalTweetId);
+    
+
+    try {
+        const originalTweet = await Post.findById(originalTweetId);
    // console.log(originalTweet)
     if (!originalTweet) exist = false;
     //onsole.log(originalTweet)
@@ -91,8 +97,6 @@ exports.quoteTweet = async (req, res, next) => {
         imageC = result.url;
 
     }
-
-    try {
 
         var quote = new Post({
             content: content,
@@ -127,7 +131,7 @@ exports.quoteTweet = async (req, res, next) => {
 
 }
 
-exports.getTweets = async (req, res, next) => {
+const getTweets = async (req, res, next) => {
     const currentPage = req.query.page || 1;
     const perPage = 2;
     let totalItmes;
@@ -157,7 +161,7 @@ exports.getTweets = async (req, res, next) => {
 
 
 
-exports.deleteTweet = async (req, res, next) => {
+const deleteTweet = async (req, res, next) => {
     const tweetId = req.body.tweetId;
     console.log('post id ', tweetId)
     try {
@@ -190,4 +194,12 @@ exports.deleteTweet = async (req, res, next) => {
 
 
 
+}
+
+
+module.exports={
+    createTweet,
+    quoteTweet,
+    deleteTweet,
+    getTweets,
 }

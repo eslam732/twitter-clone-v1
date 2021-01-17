@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt=require('jsonwebtoken');
+const { bool } = require('joi');
 
 
 const signup = async (req, res, next) => {
@@ -9,10 +10,13 @@ const signup = async (req, res, next) => {
     const password = req.body.password;
     const username = req.body.username;
     const fullname = req.body.fullname;
+    
     // Optional
     const bio = req.body.bio || null;
     const city = req.body.city || null;
     const profilePictue = req.body.profilePictue || null;
+    var private = req.body.private||false;
+    
 
     try {
         // Check If user already exists
@@ -35,6 +39,7 @@ const signup = async (req, res, next) => {
             bio,
             city,
             profilePictue,
+            private,
             password: hashedPassword
         });
         const savedUser = await user.save();

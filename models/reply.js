@@ -36,6 +36,20 @@ const commentSchema = new Schema({
             type:Schema.Types.ObjectId,
             ref:"User"
         }]
+    },
+
+    quotedTweets:{
+        numberOfQuotes:{default:0,type:Number},
+        quotedBy:[{
+            type:Schema.Types.ObjectId,
+            ref:"User"
+        }],
+        quotes:[
+            {
+                type:Schema.Types.ObjectId,
+                ref:"Tweet"  
+            }
+        ]
     }
 
 

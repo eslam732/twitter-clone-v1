@@ -215,6 +215,58 @@ const likePost = async (req, res, next) => {
 
     }
 }
+const quoteReply=async(req,res,next)=>{
+    const replyId=req.body.replyId;
+    const content=req.body.content;
+    var imageC = '';
+    var result;
+    let exist = true;
+
+    if(!replyId||!content){
+        return res.status(400).json({message:"reply id and content are required"});
+    }
+    try{
+        const originalReply = await CommetModel.findById(replyId);
+
+         if (!originalReply) exist = false;
+    
+     
+         if (req.file) {
+            
+             result = await cloudinary.uploadImageToCloudinary(req.file.path);
+             
+             imageC = result.url;
+         }
+
+
+         var quote = new Post({
+            content: content,
+            quoted:{status:true,originalReply:replyId},
+           
+            creator: req.userId,
+            imageUrl: imageC,
+        });
+        if (req.file) fs.unlinkSync(req.file.path);
+        quote.save();
+        if (exist) {
+            
+            originalReply.quotedTweets.numberOfQuotes++;
+            // console.log( originalTweet.quotedTweets.numberOfQuotes++)
+
+            originalReply.quotedTweets.quotedBy.push(req.userId);
+            originalReply.save();
+        }
+        let currentUser= await User.findById(req.userId);
+        //console.log('here',currentUser._id)
+        currentUser.tweets.push(quote._id);
+        return res.status(201).json({ message: "created", quote: quote, post: originalReply })
+
+        
+    }catch(error){
+            console.log(error)
+    }
+
+}
 
 
 
@@ -225,5 +277,6 @@ module.exports = {
     createComment,
     getPostComments,
     getReplyies,
-    likePost
+    likePost,
+    quoteReply
 }

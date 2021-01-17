@@ -56,6 +56,10 @@ default:false},
 originalTweet:{
     type:Schema.Types.ObjectId,
     ref:"Tweet"
+},
+originalReply:{
+    type:Schema.Types.ObjectId,
+    ref:"Reply"
 }
     },
     quotedTweets:{

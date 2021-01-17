@@ -23,6 +23,18 @@ const userSchema = new Schema({
     profilePictue: {
         type: String
     },
+    private:{
+type:Boolean,
+default:false
+    },
+    recivedRequestedFollows:[{
+        type:Schema.Types.ObjectId,
+        ref:"User"
+    }],
+    sentFollowRequests:[{
+        type:Schema.Types.ObjectId,
+        ref:"User"
+    }],
     bio: {
         type: String
     },
@@ -42,6 +54,10 @@ const userSchema = new Schema({
         }
     ],
     tweets:[{
+        type:Schema.Types.ObjectId,
+        ref:"Tweet"
+    }],
+    reTweets:[{
         type:Schema.Types.ObjectId,
         ref:"Tweet"
     }],
