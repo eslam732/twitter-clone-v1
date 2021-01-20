@@ -9,6 +9,6 @@ const router=express.Router();
 router.put('/createpost',isAuth,uploadImage.single('image'),postController.createTweet);
 router.get('/getposts',isAuth,postController.getTweets);
 router.delete('/deletepost',isAuth,postController.deleteTweet);
-router.put('/quote',isAuth,uploadImage.single('image'),postController.quoteTweet)
+router.put('/quotetweet',isAuth,uploadImage.single('image'),postController.quoteTweet)
 
 module.exports = router;

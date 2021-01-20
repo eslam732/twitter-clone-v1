@@ -65,6 +65,18 @@ default:false
         type:Schema.Types.ObjectId,
         ref:"Reply"
     }],
+    chats:[{
+      
+       chatId:{
+        type: Schema.Types.ObjectId,
+        ref: "Chat"
+       }
+
+    }],
+    chatedWith:[{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }],
     
     
     likes:[

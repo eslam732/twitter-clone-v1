@@ -10,6 +10,7 @@ const authRouts = require('./routes/user/auth');
 const postRouts = require('./routes/tweet/posts');
 const postServicesRouts = require('./routes/tweet/postServices');
 const userServicesRouts = require('./routes/user/userServices');
+const dmRoutes=require('./routes/dm/message');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
   app.use('/post',postRouts);
   app.use('/postServices',postServicesRouts);
   app.use('/userServices',userServicesRouts);
+  app.use('/dm',dmRoutes);
 
   
   app.use((error, req, res, next) => {
